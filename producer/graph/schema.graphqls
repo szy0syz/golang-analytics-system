@@ -14,7 +14,12 @@ type User {
   name: String!
 }
 
+type PingResponse {
+  message: String!
+}
+
 type Query {
+  ping: PingResponse
   todos: [Todo!]!
 }
 

@@ -15,6 +15,14 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) 
 	panic(fmt.Errorf("not implemented: CreateTodo - createTodo"))
 }
 
+func (r *queryResolver) Ping(ctx context.Context) (*model.PingResponse, error) {
+	res := &model.PingResponse{
+		Message: "Jerry & Tom",
+	}
+
+	return res, nil
+}
+
 // Todos is the resolver for the todos field.
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
 	panic(fmt.Errorf("not implemented: Todos - todos"))
