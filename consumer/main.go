@@ -3,13 +3,13 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
+
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/schema"
-	"log"
-	"time"
 )
 
 type Event struct {
@@ -60,7 +60,7 @@ func main() {
 	}
 
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
-		"bootstrap.servers":     "192.168.31.200",
+		"bootstrap.servers":     "localhost",
 		"group.id":              "myGroup",
 		"auto.offset.reset":     "earliest",
 		"broker.address.family": "v4",
@@ -78,7 +78,7 @@ func main() {
 	log.Println("[Consumer] => Subscribed to kafka successfully", c)
 
 	for {
-		msg, err := c.ReadMessage(time.Second)
+		msg, err := c.ReadMessage(-1)
 		if err == nil {
 			fmt.Printf("Message on %s: %s\n", msg.TopicPartition, string(msg.Value))
 			var event Event
