@@ -36,7 +36,7 @@ c, err := kafka.NewConsumer(&kafka.ConfigMap{
  for {
   msg, err := c.ReadMessage(time.Second)
   }
-``
+```
 
 - 这里没消息来时，会不停打印 `Local: Timed out`
 - 解决方案暂时改 `timeout: -1`
@@ -47,5 +47,7 @@ c, err := kafka.NewConsumer(&kafka.ConfigMap{
 - `Consumer`
 
 <img width="871" alt="image" src="https://user-images.githubusercontent.com/10555820/206913030-5ae189ef-9d8e-42d7-b155-a9f2d586dbfb.png">
+
+- `Postgres`
 
 <img width="714" alt="image" src="https://user-images.githubusercontent.com/10555820/206913078-d2e61cdb-705f-4ac2-b3c8-a9fe40d3e790.png">
