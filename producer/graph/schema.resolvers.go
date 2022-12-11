@@ -22,7 +22,7 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) 
 
 // RegisterKafkaEvent is the resolver for the register_kafka_event field.
 func (r *mutationResolver) RegisterKafkaEvent(ctx context.Context, event model.RegisterKafkaEventInput) (*model.Event, error) {
-	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": "localhost"})
+	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": "192.168.31.200"})
 	if err != nil {
 		panic(err)
 	}
@@ -45,30 +45,29 @@ func (r *mutationResolver) RegisterKafkaEvent(ctx context.Context, event model.R
 
 	// Produce messages to topic (asynchronously)
 	topic := event.EventType
-	CreateTopic(topic)
+	//CreateTopic(topic)
 	currentTimeStamp := fmt.Sprintf("%v", time.Now().Unix())
 
 	e := model.Event{
 		ID:        currentTimeStamp,
 		EventType: &event.EventType,
-		Path:      &event.Search,
+		Path:      &event.Path,
+		Search:    &event.Search,
 		Title:     &event.Title,
 		UserID:    &event.UserID,
 		URL:       &event.URL,
 	}
-
 	value, err := json.Marshal(e)
 	if err != nil {
 		log.Println("=> error converting event object to bytes:", err)
 	}
-
 	p.Produce(&kafka.Message{
 		TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
 		Value:          []byte(value),
 	}, nil)
 
 	// Wait for message deliveries before shutting down
-	p.Flush(15 * 1000)
+	p.Flush(2 * 1000)
 
 	return &e, nil
 }
@@ -97,7 +96,7 @@ type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 
 func CreateTopic(topicName string) {
-	a, err := kafka.NewAdminClient(&kafka.ConfigMap{"bootstrap.servers": "localhost"})
+	a, err := kafka.NewAdminClient(&kafka.ConfigMap{"bootstrap.servers": "192.168.31.200"})
 	if err != nil {
 		panic(err)
 	}
@@ -110,20 +109,18 @@ func CreateTopic(topicName string) {
 	}
 
 	ctx := context.Background()
-	resules, err := a.CreateTopics(
+	results, err := a.CreateTopics(
 		ctx,
 		// Multiple topics can be created simultaneously
 		// by providing more TopicSpecification structs here.
 		[]kafka.TopicSpecification{{
-			Topic:         topicName,
-			NumPartitions: 1,
+			Topic: topicName,
 		}},
 		// Admin options
-		kafka.SetAdminRequestTimeout(maxDur))
-
+		kafka.SetAdminOperationTimeout(maxDur))
 	if err != nil {
 		log.Printf("Failed to create topic: %v\n", err)
 	}
 
-	log.Println("results:", resules)
+	log.Println("results:", results)
 }
