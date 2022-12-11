@@ -22,7 +22,7 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) 
 
 // RegisterKafkaEvent is the resolver for the register_kafka_event field.
 func (r *mutationResolver) RegisterKafkaEvent(ctx context.Context, event model.RegisterKafkaEventInput) (*model.Event, error) {
-	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": "192.168.31.200"})
+	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": "localhost", "broker.address.family": "v4"})
 	if err != nil {
 		panic(err)
 	}
@@ -61,13 +61,17 @@ func (r *mutationResolver) RegisterKafkaEvent(ctx context.Context, event model.R
 	if err != nil {
 		log.Println("=> error converting event object to bytes:", err)
 	}
-	p.Produce(&kafka.Message{
+	err = p.Produce(&kafka.Message{
 		TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
 		Value:          []byte(value),
 	}, nil)
 
+	if err != nil {
+		fmt.Println("Producer Error:", err)
+	}
+
 	// Wait for message deliveries before shutting down
-	p.Flush(2 * 1000)
+	p.Flush(15 * 1000)
 
 	return &e, nil
 }
@@ -96,7 +100,7 @@ type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 
 func CreateTopic(topicName string) {
-	a, err := kafka.NewAdminClient(&kafka.ConfigMap{"bootstrap.servers": "192.168.31.200"})
+	a, err := kafka.NewAdminClient(&kafka.ConfigMap{"bootstrap.servers": "localhost"})
 	if err != nil {
 		panic(err)
 	}

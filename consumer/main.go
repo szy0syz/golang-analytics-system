@@ -3,13 +3,13 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
-
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/schema"
+	"log"
+	"time"
 )
 
 type Event struct {
@@ -40,7 +40,7 @@ func SaveEvent(db *gorm.DB, event Event) (Event, error) {
 
 func main() {
 	dbURL :=
-		`postgres://postgres:postgres@127.0.0.1:5432/postgres`
+		`postgres://postgres:postgres@localhost:5432/postgres`
 
 	ormConfig := &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
@@ -60,18 +60,25 @@ func main() {
 	}
 
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
-		"bootstrap.servers": "127.0.0.1",
-		"group.id":          "myGroup",
-		"auto.offset.reset": "earliest",
+		"bootstrap.servers":     "192.168.31.200",
+		"group.id":              "myGroup",
+		"auto.offset.reset":     "earliest",
+		"broker.address.family": "v4",
 	})
 	if err != nil {
 		panic(err)
 	}
+	log.Println("[Consumer] => Created successfully", c)
 
-	c.SubscribeTopics([]string{"PAGE_VIEW"}, nil)
+	err = c.SubscribeTopics([]string{"PAGE_VIEW_4"}, nil)
+	if err != nil {
+		panic(err)
+	}
+
+	log.Println("[Consumer] => Subscribed to kafka successfully", c)
 
 	for {
-		msg, err := c.ReadMessage(-1)
+		msg, err := c.ReadMessage(time.Second)
 		if err == nil {
 			fmt.Printf("Message on %s: %s\n", msg.TopicPartition, string(msg.Value))
 			var event Event
