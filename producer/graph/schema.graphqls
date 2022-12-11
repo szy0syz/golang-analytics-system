@@ -2,6 +2,8 @@
 #
 # https://gqlgen.com/getting-started/
 
+scalar Int64
+
 type Todo {
   id: ID!
   text: String!
@@ -28,6 +30,27 @@ input NewTodo {
   userId: String!
 }
 
+type Event {
+  id: ID!
+  eventType: String
+  path: String
+  search: String
+  title: String
+  url: String
+  userId: String
+}
+
+input RegisterKafkaEventInput {
+  eventType: String!
+  userId: String!
+  path: String!
+  search: String!
+  title: String!
+  url: String!
+}
+
 type Mutation {
   createTodo(input: NewTodo!): Todo!
+  register_kafka_event(event: RegisterKafkaEventInput!): Event!
 }
+

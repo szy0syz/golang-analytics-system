@@ -4,6 +4,7 @@ go 1.18
 
 require (
 	github.com/99designs/gqlgen v0.17.22
+	github.com/confluentinc/confluent-kafka-go v1.9.2
 	github.com/vektah/gqlparser/v2 v2.5.1
 )
 
