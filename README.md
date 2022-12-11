@@ -43,3 +43,9 @@ c, err := kafka.NewConsumer(&kafka.ConfigMap{
 - 目前能力无法解决 😅
 
 ## Flow
+
+- `Consumer`
+
+<img width="871" alt="image" src="https://user-images.githubusercontent.com/10555820/206913030-5ae189ef-9d8e-42d7-b155-a9f2d586dbfb.png">
+
+<img width="714" alt="image" src="https://user-images.githubusercontent.com/10555820/206913078-d2e61cdb-705f-4ac2-b3c8-a9fe40d3e790.png">
